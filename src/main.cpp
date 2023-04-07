@@ -1,21 +1,39 @@
-
+#include <iostream>
 #include <SFML/Graphics.hpp>
 
-class testshape
+#define SCREEN_HEIGHT 2560
+#define SCREEN_WIDTH 1440
+#define NO_OF_SPACE_OBJECTS 100
+
+class space_object
 {
 public:
-    int x, y;
-    testshape()
+    int identity;
+    sf::CircleShape shape;
+
+    space_object()
     {
-        x = 0;
-        y = 0;
+        shape.setFillColor(sf::Color::White);
+        shape.setRadius(1.f);
+    }
+
+private:
+    int x, y;
+
+public:
+    void first_init(int id)
+    {
+        identity = id;
+        x = identity;
+        y = identity;
+        shape.setPosition(x, y);
     }
 };
 
 int main()
 {
-    float a = 1;
-    sf::RenderWindow window(sf::VideoMode(2560, 1440), "Game engine");
+    space_object space_objects[NO_OF_SPACE_OBJECTS];
+    sf::RenderWindow window(sf::VideoMode(SCREEN_HEIGHT, SCREEN_WIDTH), "Game engine");
 
     while (window.isOpen())
     {
@@ -25,10 +43,8 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-
         window.clear();
         window.display();
     }
-
     return 0;
 }

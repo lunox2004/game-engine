@@ -1,0 +1,9 @@
+make the space object class
+add a random number generator
+remove the fixed pos of the numbers and add a random initial pos
+give random position to the space objects using the random number generator
+
+add gravity to the space objects(assume mass to be 1 and add verlet)
+add mass to the space objects
+change the color of the object according to speed
+users can define where the space objects are
