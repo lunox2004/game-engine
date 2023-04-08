@@ -1,2 +1,4 @@
 build/
 test.cpp
+.vscode
+test.exe
