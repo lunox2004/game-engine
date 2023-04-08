@@ -3,7 +3,7 @@
 
 #define SCREEN_HEIGHT 2560
 #define SCREEN_WIDTH 1440
-#define NO_OF_SPACE_OBJECTS 100
+#define NO_OF_SPACE_OBJECTS 1000
 
 class space_object
 {
@@ -30,10 +30,25 @@ public:
     }
 };
 
+void draw_objects(sf::RenderWindow *window, space_object object_array[], int size_of_array)
+{
+    int i;
+    for (i = 0; i < size_of_array; i++)
+    {
+        window->draw(object_array[i].shape);
+    }
+}
+
 int main()
 {
+    int i;
     space_object space_objects[NO_OF_SPACE_OBJECTS];
+    for (i = 0; i < NO_OF_SPACE_OBJECTS; i++)
+    {
+        space_objects[i].first_init(i);
+    }
     sf::RenderWindow window(sf::VideoMode(SCREEN_HEIGHT, SCREEN_WIDTH), "Game engine");
+    sf::RenderWindow *windowptr = &window;
 
     while (window.isOpen())
     {
@@ -44,6 +59,7 @@ int main()
                 window.close();
         }
         window.clear();
+        draw_objects(windowptr, space_objects, NO_OF_SPACE_OBJECTS);
         window.display();
     }
     return 0;
