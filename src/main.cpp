@@ -1,9 +1,17 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <time.h>
+#include <random>
 
-#define SCREEN_HEIGHT 2560
-#define SCREEN_WIDTH 1440
-#define NO_OF_SPACE_OBJECTS 1000
+#define SCREEN_HEIGHT 1440
+#define SCREEN_WIDTH 2560
+#define NO_OF_SPACE_OBJECTS 5500
+int random_int(int lower_bound, int upper_bound)
+{
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist(lower_bound, upper_bound);
+    return dist(rd);
+}
 
 class space_object
 {
@@ -17,25 +25,24 @@ public:
         shape.setRadius(1.f);
     }
 
-private:
-    int x, y;
-
-public:
     void first_init(int id)
     {
         identity = id;
-        x = identity;
-        y = identity;
+        shape.setPosition(random_int(0, SCREEN_WIDTH), random_int(0, SCREEN_HEIGHT));
+    }
+
+    void update_pos(int x, int y)
+    {
         shape.setPosition(x, y);
     }
 };
 
-void draw_objects(sf::RenderWindow *window, space_object object_array[], int size_of_array)
+void draw_objects(sf::RenderWindow *windowptr, space_object object_array[], int size_of_array)
 {
     int i;
     for (i = 0; i < size_of_array; i++)
     {
-        window->draw(object_array[i].shape);
+        windowptr->draw(object_array[i].shape);
     }
 }
 
@@ -47,7 +54,7 @@ int main()
     {
         space_objects[i].first_init(i);
     }
-    sf::RenderWindow window(sf::VideoMode(SCREEN_HEIGHT, SCREEN_WIDTH), "Game engine");
+    sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Game engine");
     sf::RenderWindow *windowptr = &window;
 
     while (window.isOpen())

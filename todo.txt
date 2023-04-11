@@ -1,8 +1,10 @@
-add a random number generator
-remove the fixed pos of the numbers and add a random initial pos
-give random position to the space objects using the random number generator
-
-add gravity to the space objects(assume mass to be 1 and add verlet)
+todo:
+add basic gravity to the space objects using euler
+use barnes hutt algorithm
 add mass to the space objects
 change the color of the object according to speed
+use runge-kutt for integration
 users can define where the space objects are
+
+errors to fix:
+not able to add more than 5500 objects
