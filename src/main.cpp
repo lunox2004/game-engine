@@ -5,13 +5,30 @@
 
 #define SCREEN_HEIGHT 1440
 #define SCREEN_WIDTH 2560
-#define NO_OF_SPACE_OBJECTS 5500
+#define NO_OF_SPACE_OBJECTS 5000
 
 int random_int(int lower_bound, int upper_bound)
 {
     std::random_device rd;
     std::uniform_int_distribution<int> dist(lower_bound, upper_bound);
     return dist(rd);
+}
+
+float random_float(float lower_bound, float upper_bound)
+{
+    std::random_device rd;
+    std::uniform_real_distribution<float> dist(lower_bound, upper_bound);
+    return dist(rd);
+}
+
+int absolute_value(float value)
+{
+    if (value > 0)
+        return 1;
+    else if (value < 0)
+        return -1;
+    else
+        return 0;
 }
 
 class space_object
@@ -26,26 +43,26 @@ public:
     {
         shape.setFillColor(sf::Color::White);
         shape.setRadius(1.f);
-        x_position = 0;
-        y_position = 0;
+        x_position = random_int(0, SCREEN_WIDTH);
+        y_position = random_int(0, SCREEN_HEIGHT);
         x_force = 0;
         x_acceleration = 0;
         x_velocity = 0;
         y_force = 0;
         y_acceleration = 0;
         y_velocity = 0;
-        shape.setPosition(random_int(0, SCREEN_WIDTH), random_int(0, SCREEN_HEIGHT));
+        shape.setPosition(x_position, y_position);
     }
 
-    void update_velocity(float x_acc, float y_acc, float time_step)
+    void update_velocity(float time_step)
     {
-        x_velocity = x_velocity + (x_acc * time_step);
-        y_velocity = y_velocity + (y_acc * time_step);
+        x_velocity = x_velocity + (x_acceleration * time_step);
+        y_velocity = y_velocity + (y_acceleration * time_step);
     }
-    void update_position(float x_vel, float y_vel, float time_step)
+    void update_position(float time_step)
     {
-        x_position = x_position + (x_vel * time_step);
-        y_position = y_position + (y_vel * time_step);
+        x_position = x_position + (x_velocity * time_step);
+        y_position = y_position + (y_velocity * time_step);
 
         if (x_position > SCREEN_WIDTH)
             x_position = x_position - SCREEN_WIDTH;
@@ -71,14 +88,14 @@ void draw_objects(sf::RenderWindow *windowptr, space_object object_array[], int 
     }
 }
 
-int absolute_value(float value)
+void update(space_object space_objects[], int no_of_space_objects)
 {
-    if (value > 0)
-        return 1;
-    else if (value < 0)
-        return -1;
-    else
-        return 0;
+    int i, j;
+    for (i = 0; i < no_of_space_objects; i++)
+    {
+        space_objects[i].update_velocity(0);
+        space_objects[i].update_position(0);
+    }
 }
 
 int main()
@@ -97,7 +114,9 @@ int main()
                 window.close();
         }
         window.clear();
+
         // Update here
+        update(space_objects, NO_OF_SPACE_OBJECTS);
 
         // render here
         draw_objects(windowptr, space_objects, NO_OF_SPACE_OBJECTS);
