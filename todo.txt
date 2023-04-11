@@ -1,5 +1,6 @@
 todo:
 add basic gravity to the space objects using euler
+find a way to put find force funtion inside the class
 use barnes hutt algorithm
 add mass to the space objects
 change the color of the object according to speed

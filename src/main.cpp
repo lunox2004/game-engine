@@ -6,6 +6,7 @@
 #define SCREEN_HEIGHT 1440
 #define SCREEN_WIDTH 2560
 #define NO_OF_SPACE_OBJECTS 5500
+
 int random_int(int lower_bound, int upper_bound)
 {
     std::random_device rd;
@@ -15,25 +16,49 @@ int random_int(int lower_bound, int upper_bound)
 
 class space_object
 {
+private:
+    float x_velocity, y_velocity, x_acceleration, y_acceleration, x_force, y_force, x_position, y_position;
+
 public:
-    int identity;
     sf::CircleShape shape;
 
     space_object()
     {
         shape.setFillColor(sf::Color::White);
         shape.setRadius(1.f);
-    }
-
-    void first_init(int id)
-    {
-        identity = id;
+        x_position = 0;
+        y_position = 0;
+        x_force = 0;
+        x_acceleration = 0;
+        x_velocity = 0;
+        y_force = 0;
+        y_acceleration = 0;
+        y_velocity = 0;
         shape.setPosition(random_int(0, SCREEN_WIDTH), random_int(0, SCREEN_HEIGHT));
     }
 
-    void update_pos(int x, int y)
+    void update_velocity(float x_acc, float y_acc, float time_step)
     {
-        shape.setPosition(x, y);
+        x_velocity = x_velocity + (x_acc * time_step);
+        y_velocity = y_velocity + (y_acc * time_step);
+    }
+    void update_position(float x_vel, float y_vel, float time_step)
+    {
+        x_position = x_position + (x_vel * time_step);
+        y_position = y_position + (y_vel * time_step);
+
+        if (x_position > SCREEN_WIDTH)
+            x_position = x_position - SCREEN_WIDTH;
+
+        if (x_position < 0)
+            x_position = SCREEN_WIDTH - x_position;
+
+        if (y_position > SCREEN_HEIGHT)
+            y_position = y_position - SCREEN_HEIGHT;
+
+        if (y_position < 0)
+            y_position = SCREEN_HEIGHT - y_position;
+        shape.setPosition(x_position, y_position);
     }
 };
 
@@ -46,14 +71,20 @@ void draw_objects(sf::RenderWindow *windowptr, space_object object_array[], int 
     }
 }
 
+int absolute_value(float value)
+{
+    if (value > 0)
+        return 1;
+    else if (value < 0)
+        return -1;
+    else
+        return 0;
+}
+
 int main()
 {
     int i;
     space_object space_objects[NO_OF_SPACE_OBJECTS];
-    for (i = 0; i < NO_OF_SPACE_OBJECTS; i++)
-    {
-        space_objects[i].first_init(i);
-    }
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Game engine");
     sf::RenderWindow *windowptr = &window;
 
@@ -66,6 +97,9 @@ int main()
                 window.close();
         }
         window.clear();
+        // Update here
+
+        // render here
         draw_objects(windowptr, space_objects, NO_OF_SPACE_OBJECTS);
         window.display();
     }
