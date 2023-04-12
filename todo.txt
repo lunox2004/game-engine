@@ -1,8 +1,8 @@
 todo:
-add basic gravity to the space objects using euler
+fix collisions
+bodies should merge elastically or inelastically
 find a way to put find force funtion inside the class
 use barnes hutt algorithm
-add mass to the space objects
 change the color of the object according to speed
 use runge-kutt for integration
 users can define where the space objects are
