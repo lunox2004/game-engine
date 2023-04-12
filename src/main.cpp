@@ -5,7 +5,7 @@
 
 #define SCREEN_HEIGHT 1440
 #define SCREEN_WIDTH 2560
-#define NO_OF_SPACE_OBJECTS 3
+#define NO_OF_SPACE_OBJECTS 100
 #define GRAVITY_CONSTANT 1
 
 int random_int(int lower_bound, int upper_bound)
@@ -35,56 +35,59 @@ int absolute_value(float value)
 class space_object
 {
 private:
-    float x_velocity, y_velocity, x_acceleration, y_acceleration;
+    float velocity[2], acceleration[2];
 
 public:
     sf::CircleShape shape;
-    float x_force, y_force, x_position, y_position, mass;
+    float force[2], position[2], mass;
 
     space_object()
     {
         shape.setFillColor(sf::Color::White);
         shape.setRadius(10);
-        x_position = random_int(0, SCREEN_WIDTH);
-        y_position = random_int(0, SCREEN_HEIGHT);
-        x_force = 0;
-        x_acceleration = 0;
-        x_velocity = 0;
-        y_force = 0;
-        y_acceleration = 0;
-        y_velocity = 0;
-        shape.setPosition(x_position, y_position);
+        position[0] = random_int(0, SCREEN_WIDTH);
+        position[1] = random_int(0, SCREEN_HEIGHT);
+        velocity[0] = 0;
+        velocity[1] = 0;
+        force[0] = 0;
+        force[1] = 0;
+        acceleration[0] = 0;
+        acceleration[1] = 0;
+        shape.setPosition(position[0], position[1]);
         mass = 1;
     }
 
     void update_acceleration()
     {
-        x_acceleration = x_force / mass;
-        y_acceleration = y_force / mass;
+        int i;
+        for (i = 0; i < 2; i++)
+            acceleration[i] = force[i] / mass;
     }
 
     void update_velocity(float time_step)
     {
-        x_velocity = x_velocity + (x_acceleration * time_step);
-        y_velocity = y_velocity + (y_acceleration * time_step);
+        int i;
+        for (i = 0; i < 2; i++)
+            velocity[i] = velocity[i] + (acceleration[i] * time_step);
     }
     void update_position(float time_step)
     {
-        x_position = x_position + (x_velocity * time_step);
-        y_position = y_position + (y_velocity * time_step);
+        int i;
+        for (i = 0; i < 2; i++)
+            position[i] = position[i] + (velocity[i] * time_step);
 
-        if (x_position > SCREEN_WIDTH)
-            x_position = x_position - SCREEN_WIDTH;
+        if (position[0] > SCREEN_WIDTH)
+            position[0] = position[0] - SCREEN_WIDTH;
 
-        if (x_position < 0)
-            x_position = SCREEN_WIDTH - x_position;
+        if (position[0] < 0)
+            position[0] = SCREEN_WIDTH - position[0];
 
-        if (y_position > SCREEN_HEIGHT)
-            y_position = y_position - SCREEN_HEIGHT;
+        if (position[1] > SCREEN_HEIGHT)
+            position[1] = position[1] - SCREEN_HEIGHT;
 
-        if (y_position < 0)
-            y_position = SCREEN_HEIGHT - y_position;
-        shape.setPosition(x_position, y_position);
+        if (position[1] < 0)
+            position[1] = SCREEN_HEIGHT - position[1];
+        shape.setPosition(position[0], position[1]);
     }
 };
 
@@ -107,26 +110,7 @@ void update_force(space_object space_objects[], int no_of_space_objects)
         {
             if (j == i)
                 continue;
-            disp_x = space_objects[j].x_position - space_objects[i].x_position;
-            if (disp_x > 1 || disp_x < -1)
-            {
-                space_objects[i].x_force = space_objects[i].x_force + (GRAVITY_CONSTANT * (absolute_value(disp_x) * (1 / (disp_x * disp_x))));
-            }
-            else
-            {
-                space_objects[i].x_force = 0;
-            }
-
-            disp_y = space_objects[j].y_position - space_objects[i].y_position;
-            if (disp_y > 1 || disp_y < -1)
-            {
-                space_objects[i].y_force = space_objects[i].y_force + (GRAVITY_CONSTANT * (absolute_value(disp_y) * (1 / (disp_y * disp_y))));
-            }
-            else
-            {
-                space_objects[i].y_force = 0;
-            }
-        }
+                }
     }
 }
 
