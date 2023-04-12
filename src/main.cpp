@@ -5,7 +5,8 @@
 
 #define SCREEN_HEIGHT 1440
 #define SCREEN_WIDTH 2560
-#define NO_OF_SPACE_OBJECTS 5000
+#define NO_OF_SPACE_OBJECTS 3
+#define GRAVITY_CONSTANT 1
 
 int random_int(int lower_bound, int upper_bound)
 {
@@ -34,15 +35,16 @@ int absolute_value(float value)
 class space_object
 {
 private:
-    float x_velocity, y_velocity, x_acceleration, y_acceleration, x_force, y_force, x_position, y_position;
+    float x_velocity, y_velocity, x_acceleration, y_acceleration;
 
 public:
     sf::CircleShape shape;
+    float x_force, y_force, x_position, y_position, mass;
 
     space_object()
     {
         shape.setFillColor(sf::Color::White);
-        shape.setRadius(1.f);
+        shape.setRadius(10);
         x_position = random_int(0, SCREEN_WIDTH);
         y_position = random_int(0, SCREEN_HEIGHT);
         x_force = 0;
@@ -52,6 +54,13 @@ public:
         y_acceleration = 0;
         y_velocity = 0;
         shape.setPosition(x_position, y_position);
+        mass = 1;
+    }
+
+    void update_acceleration()
+    {
+        x_acceleration = x_force / mass;
+        y_acceleration = y_force / mass;
     }
 
     void update_velocity(float time_step)
@@ -88,16 +97,50 @@ void draw_objects(sf::RenderWindow *windowptr, space_object object_array[], int 
     }
 }
 
-void update(space_object space_objects[], int no_of_space_objects)
+void update_force(space_object space_objects[], int no_of_space_objects)
 {
     int i, j;
+    float disp_x, disp_y;
     for (i = 0; i < no_of_space_objects; i++)
     {
-        space_objects[i].update_velocity(0);
-        space_objects[i].update_position(0);
+        for (j = 0; j < no_of_space_objects; j++)
+        {
+            if (j == i)
+                continue;
+            disp_x = space_objects[j].x_position - space_objects[i].x_position;
+            if (disp_x > 1 || disp_x < -1)
+            {
+                space_objects[i].x_force = space_objects[i].x_force + (GRAVITY_CONSTANT * (absolute_value(disp_x) * (1 / (disp_x * disp_x))));
+            }
+            else
+            {
+                space_objects[i].x_force = 0;
+            }
+
+            disp_y = space_objects[j].y_position - space_objects[i].y_position;
+            if (disp_y > 1 || disp_y < -1)
+            {
+                space_objects[i].y_force = space_objects[i].y_force + (GRAVITY_CONSTANT * (absolute_value(disp_y) * (1 / (disp_y * disp_y))));
+            }
+            else
+            {
+                space_objects[i].y_force = 0;
+            }
+        }
     }
 }
 
+void update(space_object space_objects[], int no_of_space_objects)
+{
+    int i, j;
+    update_force(space_objects, no_of_space_objects);
+    for (i = 0; i < no_of_space_objects; i++)
+    {
+        space_objects[i].update_acceleration();
+        space_objects[i].update_velocity(0.01);
+        space_objects[i].update_position(0.01);
+    }
+}
 int main()
 {
     int i;
