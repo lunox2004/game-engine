@@ -5,9 +5,19 @@
 
 #define SCREEN_HEIGHT 1440
 #define SCREEN_WIDTH 2560
-#define NO_OF_SPACE_OBJECTS 100
-#define GRAVITY_CONSTANT 1
+#define NO_OF_SPACE_OBJECTS 2
+#define GRAVITY_CONSTANT 2
 
+/* funtion breaks when you enter a fraction as any of the parameters*/
+float simple_exponent(float base, int exponenet)
+{
+    if (exponenet < 1)
+        return 1;
+    else
+        return base * simple_exponent(base, exponenet - 1);
+}
+
+/*Returns a random integer ,upper and lower bound included*/
 int random_int(int lower_bound, int upper_bound)
 {
     std::random_device rd;
@@ -15,6 +25,7 @@ int random_int(int lower_bound, int upper_bound)
     return dist(rd);
 }
 
+/*Returns a random float value , upper and lower bound included*/
 float random_float(float lower_bound, float upper_bound)
 {
     std::random_device rd;
@@ -35,11 +46,11 @@ int absolute_value(float value)
 class space_object
 {
 private:
-    float velocity[2], acceleration[2];
+    float velocity[2];
 
 public:
     sf::CircleShape shape;
-    float force[2], position[2], mass;
+    float force[2], position[2], mass, acceleration[2];
 
     space_object()
     {
@@ -51,8 +62,8 @@ public:
         velocity[1] = 0;
         force[0] = 0;
         force[1] = 0;
-        acceleration[0] = 0;
-        acceleration[1] = 0;
+        acceleration[0] = 1;
+        acceleration[1] = 1;
         shape.setPosition(position[0], position[1]);
         mass = 1;
     }
@@ -103,14 +114,25 @@ void draw_objects(sf::RenderWindow *windowptr, space_object object_array[], int 
 void update_force(space_object space_objects[], int no_of_space_objects)
 {
     int i, j;
-    float disp_x, disp_y;
+    float magnitude_squared, magnitude;
     for (i = 0; i < no_of_space_objects; i++)
     {
+        for (j = 0; j < 2; j++)
+        {
+            space_objects[i].force[j] = 0;
+        }
         for (j = 0; j < no_of_space_objects; j++)
         {
             if (j == i)
                 continue;
-                }
+            magnitude_squared = (simple_exponent((space_objects[j].position[0] - space_objects[i].position[0]), 2)) +
+                                (simple_exponent((space_objects[j].position[1] - space_objects[i].position[1]), 2));
+            if (magnitude_squared < space_objects[i].shape.getRadius())
+                continue;
+            magnitude = sqrt(magnitude_squared);
+            space_objects[i].force[0] = (GRAVITY_CONSTANT * space_objects[i].mass * space_objects[j].mass * (space_objects[j].position[0] - space_objects[i].position[0])) / simple_exponent(magnitude, 3);
+            space_objects[i].force[1] = (GRAVITY_CONSTANT * space_objects[i].mass * space_objects[j].mass * (space_objects[j].position[1] - space_objects[i].position[1])) / simple_exponent(magnitude, 3);
+        }
     }
 }
 
@@ -121,8 +143,8 @@ void update(space_object space_objects[], int no_of_space_objects)
     for (i = 0; i < no_of_space_objects; i++)
     {
         space_objects[i].update_acceleration();
-        space_objects[i].update_velocity(0.01);
-        space_objects[i].update_position(0.01);
+        space_objects[i].update_velocity(1);
+        space_objects[i].update_position(1);
     }
 }
 int main()
