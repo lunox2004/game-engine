@@ -1,6 +1,7 @@
 todo:
 fix collisions
 bodies should merge elastically or inelastically
+use dynamic memory allocation to add and remove objects
 find a way to put find force funtion inside the class
 use barnes hutt algorithm
 change the color of the object according to speed

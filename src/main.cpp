@@ -1,12 +1,13 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <time.h>
 #include <random>
+#include <cmath>
 
 #define SCREEN_HEIGHT 1440
 #define SCREEN_WIDTH 2560
-#define NO_OF_SPACE_OBJECTS 5
-#define GRAVITY_CONSTANT 1
+#define NO_OF_SPACE_OBJECTS 500
+#define GRAVITY_CONSTANT 0.05
+#define PI 3.141592
 
 /* funtion breaks when you enter a fraction as any of the parameters*/
 float simple_exponent(float base, int exponenet)
@@ -15,6 +16,14 @@ float simple_exponent(float base, int exponenet)
         return 1;
     else
         return base * simple_exponent(base, exponenet - 1);
+}
+
+/*Converts degrees to radians*/
+float degrees_to_radians(float degree)
+{
+    float radian;
+    radian = degree * (PI / 180);
+    return radian;
 }
 
 /*Returns a random integer ,upper and lower bound included*/
@@ -56,7 +65,7 @@ public:
     space_object()
     {
         shape.setFillColor(sf::Color::White);
-        shape.setRadius(3);
+        shape.setRadius(1);
         position[0] = random_int(0, SCREEN_WIDTH);
         position[1] = random_int(0, SCREEN_HEIGHT);
         velocity[0] = 0;
@@ -104,6 +113,12 @@ public:
     }
 
     void set_position(float x, float y)
+    {
+        position[0] = x;
+        position[1] = y;
+        shape.setPosition(position[0], position[1]);
+    }
+    void set_position(double x, double y)
     {
         position[0] = x;
         position[1] = y;
@@ -159,6 +174,7 @@ void update_force(space_object space_objects[], int no_of_space_objects)
 
 void update(space_object space_objects[], int no_of_space_objects)
 {
+
     int i, j;
     update_force(space_objects, no_of_space_objects);
     for (i = 0; i < no_of_space_objects; i++)
