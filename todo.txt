@@ -1,4 +1,5 @@
 todo:
+add dynamic time steps
 fix collisions
 bodies should merge elastically or inelastically
 use dynamic memory allocation to add and remove objects
@@ -10,3 +11,4 @@ users can define where the space objects are
 
 errors to fix:
 not able to add more than 5500 objects
+when ther are too many objects , objects seem to only be attracted to a single object

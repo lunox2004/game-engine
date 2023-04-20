@@ -1,12 +1,14 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
 #include <random>
 #include <cmath>
 
 #define SCREEN_HEIGHT 1440
 #define SCREEN_WIDTH 2560
 #define NO_OF_SPACE_OBJECTS 500
-#define GRAVITY_CONSTANT 0.05
+#define GRAVITY_CONSTANT 0.5
 #define PI 3.141592
 
 /* funtion breaks when you enter a fraction as any of the parameters*/
@@ -42,6 +44,7 @@ float random_float(float lower_bound, float upper_bound)
     return dist(rd);
 }
 
+/*Returns an absolute value of a program*/
 int absolute_value(float value)
 {
     if (value > 0)
@@ -65,7 +68,7 @@ public:
     space_object()
     {
         shape.setFillColor(sf::Color::White);
-        shape.setRadius(1);
+        shape.setRadius(10);
         position[0] = random_int(0, SCREEN_WIDTH);
         position[1] = random_int(0, SCREEN_HEIGHT);
         velocity[0] = 0;
@@ -75,7 +78,7 @@ public:
         acceleration[0] = 0;
         acceleration[1] = 0;
         shape.setPosition(position[0], position[1]);
-        mass = 50;
+        mass = 1;
         fixed_pos = false;
     }
 
@@ -90,14 +93,20 @@ public:
     {
         int i;
         for (i = 0; i < 2; i++)
-            velocity[i] = velocity[i] + (acceleration[i] * time_step);
+            velocity[i] += (acceleration[i] * time_step);
     }
     void update_position(float time_step)
     {
         int i;
         for (i = 0; i < 2; i++)
-            position[i] = position[i] + (velocity[i] * time_step);
+            position[i] += (velocity[i] * time_step);
 
+        // tp_particle_back_to_screen();
+        shape.setPosition(position[0], position[1]);
+    }
+
+    void tp_particle_back_to_screen()
+    {
         if (position[0] > SCREEN_WIDTH)
             position[0] = position[0] - SCREEN_WIDTH;
 
@@ -109,7 +118,6 @@ public:
 
         if (position[1] < 0)
             position[1] = SCREEN_HEIGHT - position[1];
-        shape.setPosition(position[0], position[1]);
     }
 
     void set_position(float x, float y)
@@ -119,6 +127,12 @@ public:
         shape.setPosition(position[0], position[1]);
     }
     void set_position(double x, double y)
+    {
+        position[0] = x;
+        position[1] = y;
+        shape.setPosition(position[0], position[1]);
+    }
+    void set_position(int x, int y)
     {
         position[0] = x;
         position[1] = y;
@@ -166,13 +180,13 @@ void update_force(space_object space_objects[], int no_of_space_objects)
                 continue;
             }
             magnitude = sqrt(magnitude_squared);
-            space_objects[i].force[0] = (GRAVITY_CONSTANT * space_objects[i].mass * space_objects[j].mass * (space_objects[j].position[0] - space_objects[i].position[0])) / simple_exponent(magnitude, 3);
-            space_objects[i].force[1] = (GRAVITY_CONSTANT * space_objects[i].mass * space_objects[j].mass * (space_objects[j].position[1] - space_objects[i].position[1])) / simple_exponent(magnitude, 3);
+            space_objects[i].force[0] += (GRAVITY_CONSTANT * space_objects[i].mass * space_objects[j].mass * (space_objects[j].position[0] - space_objects[i].position[0])) / simple_exponent(magnitude, 3);
+            space_objects[i].force[1] += (GRAVITY_CONSTANT * space_objects[i].mass * space_objects[j].mass * (space_objects[j].position[1] - space_objects[i].position[1])) / simple_exponent(magnitude, 3);
         }
     }
 }
 
-void update(space_object space_objects[], int no_of_space_objects)
+void update(space_object space_objects[], int no_of_space_objects, float delta_time)
 {
 
     int i, j;
@@ -180,15 +194,17 @@ void update(space_object space_objects[], int no_of_space_objects)
     for (i = 0; i < no_of_space_objects; i++)
     {
         space_objects[i].update_acceleration();
-        space_objects[i].update_velocity(1);
-        if (space_objects[i].fixed_pos)
+        space_objects[i].update_velocity(delta_time);
+        if (space_objects[i].fixed_pos == true)
             continue;
-        space_objects[i].update_position(1);
+        space_objects[i].update_position(delta_time);
     }
 }
 int main()
 {
     space_object space_objects[NO_OF_SPACE_OBJECTS];
+    sf::Clock dtclock;
+    float dt;
 
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Game engine");
     sf::RenderWindow *windowptr = &window;
@@ -201,10 +217,13 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
+
+        dt = dtclock.restart().asSeconds();
+
         window.clear();
 
         // Update here
-        update(space_objects, NO_OF_SPACE_OBJECTS);
+        update(space_objects, NO_OF_SPACE_OBJECTS, dt * 100);
 
         // render here
         draw_objects(windowptr, space_objects, NO_OF_SPACE_OBJECTS);
